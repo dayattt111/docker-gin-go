@@ -1,0 +1,3 @@
+api.localhost {
+    reverse_proxy api_golang:8080
+}

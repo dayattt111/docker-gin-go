@@ -1,27 +1,50 @@
-version: '2.39.2'
-
 networks:
-    backend:
-        driver: bridge
+  backend:
+    driver: bridge
 
 services:
-    web:
-        build:
-            context: .
-            dockerfile: Dockerfile
-        ports:
-            - "8080:8080"
-        restart: unless-stopped
-        expose:
-            - 8080
-        networks:
-            - backend
-        depends_on: 
-            - redis
+  caddy_api:
+    image: caddy:alpine
+    container_name: caddy_api
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    networks:
+      - backend
+    volumes:
+      - ./conf:/etc/caddy
+      - api_data:/data
+      - api_config:/config
 
-    redis:
-        image: redis
-        ports:
-            - "6379:6379"
-        networks:
-            - backend
+  api_golang:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: api_golang
+    ports:
+      - "9876:8080"
+    restart: unless-stopped
+    expose:
+      - "8080"
+    networks:
+      - backend
+    depends_on:
+      - redis
+    volumes:
+      - golang-data:/app
+
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - backend
+
+volumes:
+  api_data:
+  api_config:
+  golang-data:
