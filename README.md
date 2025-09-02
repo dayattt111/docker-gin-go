@@ -9,3 +9,5 @@ On Linux, run the following command to add entries to /etc/hosts: echo -e "127.0
 ## test url
 
 - api.localhost:9876/api/v1/auth/throttle
+
+Happy
